@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+    <!-- Scores Header -->
+    <div class="text-center mb-12">
+        <h2 class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 uppercase font-orbitron tracking-wider mb-4">
+            YOUR PERFORMANCE
+        </h2>
+        <div class="w-24 h-1 bg-gradient-to-r from-blue-400 to-purple-600 mx-auto"></div>
+    </div>
+
+    <!-- Scores Container -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Personal Scores -->
+        <div class="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white font-orbitron">
+                    <i class="fas fa-trophy mr-2 text-yellow-400"></i>
+                    Your Scores
+                </h3>
+                <span class="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm font-orbitron">
+                    {{ scores|length }} records
+                </span>
+            </div>
+
+            {% if scores %}
+            <div class="space-y-4 max-h-96 overflow-y-auto pr-2">
+                {% for score in scores %}
+                <div class="bg-black/20 p-4 rounded-lg border-l-4 border-blue-400 flex justify-between items-center">
+                    <div>
+                        <p class="text-white font-medium">{{ score }}</p>
+                        <p class="text-gray-400 text-sm mt-1">{{ loop.index }}. attempt</p>
+                    </div>
+                    <span class="bg-blue-400/20 text-blue-400 px-3 py-1 rounded-full text-sm">Score</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-chart-line text-4xl text-gray-500 mb-4"></i>
+                <p class="text-gray-400 font-orbitron">No scores recorded yet</p>
+                <p class="text-gray-500 text-sm mt-2">Play games to see your progress</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="bg-white/5 border border-white/10 rounded-xl p-6 backdrop-blur-sm">
+            <div class="flex items-center justify-between mb-6">
+                <h3 class="text-xl font-bold text-white font-orbitron">
+                    <i class="fas fa-crown mr-2 text-yellow-400"></i>
+                    Top Players
+                </h3>
+                <span class="bg-purple-600/20 text-purple-400 px-3 py-1 rounded-full text-sm font-orbitron">
+                    {{ top_players|length }} players
+                </span>
+            </div>
+
+            {% if top_players %}
+            <div class="space-y-3">
+                {% for player, score in top_players %}
+                <div class="flex items-center justify-between p-3 rounded-lg {% if loop.index <= 3 %}bg-gradient-to-r from-purple-600/20 to-blue-600/20{% else %}bg-black/20{% endif %}">
+                    <div class="flex items-center">
+                        <span class="w-8 h-8 flex items-center justify-center rounded-full 
+                                  {% if loop.index == 1 %}bg-yellow-500 text-white
+                                  {% elif loop.index == 2 %}bg-gray-400 text-white
+                                  {% elif loop.index == 3 %}bg-amber-700 text-white
+                                  {% else %}bg-gray-700 text-gray-300{% endif %} 
+                                  mr-3 font-bold">
+                            {{ loop.index }}
+                        </span>
+                        <span class="font-medium text-white">{{ player }}</span>
+                    </div>
+                    <span class="bg-green-500/20 text-green-400 px-3 py-1 rounded-full text-sm font-medium">
+                        {{ score }} pts
+                    </span>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-12">
+                <i class="fas fa-users text-4xl text-gray-500 mb-4"></i>
+                <p class="text-gray-400 font-orbitron">No player data available</p>
+                <p class="text-gray-500 text-sm mt-2">Be the first to top the leaderboard!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom scrollbar */
+    .overflow-y-auto::-webkit-scrollbar {
+        width: 6px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-thumb {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 10px;
+    }
+    .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+        background: rgba(255, 255, 255, 0.3);
+    }
+</style>
+{% endblock %}

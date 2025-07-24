@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Game Header -->
+    <div class="text-center mb-8">
+        <h2 class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-neonpurple-500 to-pink-400 uppercase font-orbitron tracking-wider">
+            ROCK PAPER SCISSORS
+        </h2>
+        <p class="text-neonpurple-300 font-orbitron mt-2">Classic duel against the computer</p>
+    </div>
+
+    <!-- Game Container -->
+    <div class="bg-black/50 border border-neonpurple-500/30 rounded-xl p-6 shadow-neon-sm backdrop-blur-sm">
+        <!-- Score Board -->
+        <div class="grid grid-cols-3 gap-4 mb-8">
+            <div class="bg-black/30 border border-neonpurple-500/20 rounded-lg p-4 text-center">
+                <p class="text-gray-400 font-orbitron">Rounds</p>
+                <p id="rounds" class="text-2xl text-white font-orbitron">0</p>
+            </div>
+            <div class="bg-black/30 border border-green-500/20 rounded-lg p-4 text-center">
+                <p class="text-gray-400 font-orbitron">Wins</p>
+                <p id="wins" class="text-2xl text-green-400 font-orbitron">0</p>
+            </div>
+            <div class="bg-black/30 border border-red-500/20 rounded-lg p-4 text-center">
+                <p class="text-gray-400 font-orbitron">Losses</p>
+                <p id="losses" class="text-2xl text-red-400 font-orbitron">0</p>
+            </div>
+        </div>
+
+        <!-- Choices -->
+        <div class="flex justify-center space-x-4 mb-8">
+            <button class="choice-btn" data-choice="rock">
+                <div class="bg-black/50 border-2 border-neonpurple-500/50 hover:border-neonpurple-500 hover:shadow-neon text-white text-2xl px-6 py-4 rounded-xl font-orbitron transition-all duration-300">
+                    ✊ ROCK
+                </div>
+            </button>
+            <button class="choice-btn" data-choice="paper">
+                <div class="bg-black/50 border-2 border-neonpurple-500/50 hover:border-neonpurple-500 hover:shadow-neon text-white text-2xl px-6 py-4 rounded-xl font-orbitron transition-all duration-300">
+                    ✋ PAPER
+                </div>
+            </button>
+            <button class="choice-btn" data-choice="scissors">
+                <div class="bg-black/50 border-2 border-neonpurple-500/50 hover:border-neonpurple-500 hover:shadow-neon text-white text-2xl px-6 py-4 rounded-xl font-orbitron transition-all duration-300">
+                    ✌️ SCISSORS
+                </div>
+            </button>
+        </div>
+
+        <!-- Results Display -->
+        <div class="mb-8 p-6 bg-black/30 rounded-xl border border-neonpurple-500/20">
+            <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                    <p class="text-gray-400 font-orbitron">Your choice:</p>
+                    <p id="user-choice" class="text-xl text-white font-orbitron">-</p>
+                </div>
+                <div>
+                    <p class="text-gray-400 font-orbitron">Computer choice:</p>
+                    <p id="computer-choice" class="text-xl text-white font-orbitron">-</p>
+                </div>
+            </div>
+            <div class="text-center">
+                <p id="round-result" class="text-xl font-orbitron"></p>
+            </div>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="flex justify-center mb-4">
+            <button id="new-game-btn" class="bg-neonpurple-500/80 hover:bg-neonpurple-500 text-white px-8 py-3 rounded-lg font-orbitron tracking-wider transition-all duration-300">
+                NEW GAME
+            </button>
+        </div>
+
+        <!-- Final Result -->
+        <div id="game-final-result" class="text-center"></div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const rpsGame = {
+        rounds: 0,
+        wins: 0,
+        losses: 0,
+        
+        init: function() {
+            this.choiceBtns = document.querySelectorAll('.choice-btn');
+            this.newGameBtn = document.getElementById('new-game-btn');
+            this.userChoiceDisplay = document.getElementById('user-choice');
+            this.computerChoiceDisplay = document.getElementById('computer-choice');
+            this.roundResultDisplay = document.getElementById('round-result');
+            this.roundsDisplay = document.getElementById('rounds');
+            this.winsDisplay = document.getElementById('wins');
+            this.lossesDisplay = document.getElementById('losses');
+            this.gameFinalResult = document.getElementById('game-final-result');
+            
+            this.setupEventListeners();
+            this.newGame();
+        },
+        
+        setupEventListeners: function() {
+            this.choiceBtns.forEach(btn => {
+                btn.addEventListener('click', () => this.playRound(btn.dataset.choice));
+            });
+            
+            this.newGameBtn.addEventListener('click', () => this.newGame());
+        },
+        
+        newGame: function() {
+            fetch('{{ url_for("rps") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ action: 'new' })
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.rounds = 0;
+                this.wins = 0;
+                this.losses = 0;
+                this.updateScoreDisplay();
+                this.userChoiceDisplay.textContent = '-';
+                this.computerChoiceDisplay.textContent = '-';
+                this.roundResultDisplay.textContent = '';
+                this.roundResultDisplay.className = '';
+                this.gameFinalResult.innerHTML = '';
+            })
+            .catch(error => console.error('Error:', error));
+        },
+        
+        playRound: function(userChoice) {
+            fetch('{{ url_for("rps") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    action: 'play',
+                    choice: userChoice
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                this.rounds++;
+                this.userChoiceDisplay.textContent = this.getEmoji(data.user_choice) + ' ' + data.user_choice.toUpperCase();
+                this.computerChoiceDisplay.textContent = this.getEmoji(data.computer_choice) + ' ' + data.computer_choice.toUpperCase();
+                
+                if (data.result === 'win') {
+                    this.wins++;
+                    this.roundResultDisplay.textContent = '🎉 YOU WIN THIS ROUND!';
+                    this.roundResultDisplay.className = 'text-green-400 font-orbitron';
+                } else if (data.result === 'lose') {
+                    this.losses++;
+                    this.roundResultDisplay.textContent = '😞 COMPUTER WINS THIS ROUND!';
+                    this.roundResultDisplay.className = 'text-red-400 font-orbitron';
+                } else {
+                    this.roundResultDisplay.textContent = '🤝 IT\'S A TIE!';
+                    this.roundResultDisplay.className = 'text-gray-300 font-orbitron';
+                }
+                
+                this.updateScoreDisplay();
+                
+                if (this.wins >= 3 || this.losses >= 3) {
+                    if (this.wins >= 3) {
+                        this.gameFinalResult.innerHTML = `
+                            <div class="mt-6 p-4 bg-green-500/20 border-2 border-green-500 rounded-xl">
+                                <p class="text-2xl text-green-400 font-orbitron">🏆 YOU ARE THE CHAMPION! 🏆</p>
+                            </div>
+                        `;
+                    } else {
+                        this.gameFinalResult.innerHTML = `
+                            <div class="mt-6 p-4 bg-red-500/20 border-2 border-red-500 rounded-xl">
+                                <p class="text-2xl text-red-400 font-orbitron">💻 COMPUTER WINS THE GAME!</p>
+                            </div>
+                        `;
+                    }
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        },
+        
+        getEmoji: function(choice) {
+            const emojis = {
+                'rock': '✊',
+                'paper': '✋',
+                'scissors': '✌️'
+            };
+            return emojis[choice] || '';
+        },
+        
+        updateScoreDisplay: function() {
+            this.roundsDisplay.textContent = this.rounds;
+            this.winsDisplay.textContent = this.wins;
+            this.lossesDisplay.textContent = this.losses;
+        }
+    };
+    
+    rpsGame.init();
+});
+</script>
+
+<style>
+.choice-btn {
+    transition: transform 0.2s ease;
+    background: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.choice-btn:hover {
+    transform: translateY(-3px);
+}
+
+.choice-btn:active {
+    transform: translateY(1px);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+#new-game-btn:hover {
+    animation: pulse 1s infinite;
+}
+</style>
+{% endblock %}

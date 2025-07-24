@@ -1,0 +1,425 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8">
+    <!-- Game Header -->
+    <div class="text-center mb-8">
+        <h2 class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-neonpurple-500 to-pink-400 uppercase font-orbitron tracking-wider">
+            MATH MASTER CHALLENGE
+        </h2>
+        <p class="text-neonpurple-300 font-orbitron mt-2">Solve problems before time runs out!</p>
+    </div>
+
+    <!-- Game Container -->
+    <div class="bg-black/50 border border-neonpurple-500/30 rounded-xl p-6 shadow-neon-sm backdrop-blur-sm">
+        <!-- Game Info Bar -->
+        <div class="flex flex-wrap justify-between items-center mb-6 p-4 bg-black/30 rounded-lg border border-neonpurple-500/20">
+            <div class="flex items-center space-x-6">
+                <div class="text-neonpurple-400 font-orbitron">
+                    <span class="text-gray-400">Level:</span> 
+                    <span id="level" class="text-white ml-1">Easy</span>
+                </div>
+                <div class="text-neonpurple-400 font-orbitron">
+                    <span class="text-gray-400">Score:</span> 
+                    <span id="score" class="text-white ml-1">0</span>
+                </div>
+                <div class="text-neonpurple-400 font-orbitron">
+                    <span class="text-gray-400">Time:</span> 
+                    <span id="timer" class="text-white ml-1">30</span>
+                </div>
+            </div>
+            <div class="text-neonpurple-400 font-orbitron">
+                <span class="text-gray-400">Question:</span> 
+                <span id="question-number" class="text-white ml-1">1/5</span>
+            </div>
+        </div>
+
+        <!-- Game Area -->
+        <div class="flex flex-col items-center">
+            <!-- Question Display -->
+            <div class="question-display mb-8 p-6 bg-black/30 rounded-xl border border-neonpurple-500/20 w-full max-w-md text-center">
+                <div id="question" class="text-4xl font-bold text-white font-orbitron tracking-wider py-4">
+                    Loading...
+                </div>
+            </div>
+
+            <!-- Answer Input -->
+            <div class="answer-input mb-8 w-full max-w-md">
+                <div class="relative">
+                    <input type="number" id="answer-input" 
+                        class="w-full bg-black/50 border-2 border-neonpurple-500/50 text-white text-2xl px-6 py-4 rounded-lg font-orbitron text-center focus:outline-none focus:border-neonpurple-500 focus:shadow-neon-sm"
+                        placeholder="Your answer">
+                    <button id="submit-btn" class="absolute right-2 top-1/2 transform -translate-y-1/2 bg-neonpurple-500/80 hover:bg-neonpurple-500 text-white px-4 py-2 rounded font-orbitron transition-all duration-300">
+                        GO
+                    </button>
+                </div>
+            </div>
+
+            <!-- Feedback Area -->
+            <div id="feedback" class="min-h-16 mb-6 w-full max-w-md text-center">
+                <!-- Feedback will appear here -->
+            </div>
+        </div>
+
+        <!-- Game Result Modal (hidden by default) -->
+        <div id="game-result-modal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+            <div class="bg-black border-2 border-neonpurple-500 rounded-xl p-8 max-w-md w-full mx-4 shadow-neon">
+                <div id="game-result-content" class="text-center"></div>
+                <div class="mt-6 flex justify-center space-x-4" id="modal-buttons">
+                    <!-- Buttons will be added dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const elements = {
+        levelDisplay: document.getElementById('level'),
+        scoreDisplay: document.getElementById('score'),
+        timerDisplay: document.getElementById('timer'),
+        questionNumberDisplay: document.getElementById('question-number'),
+        questionDisplay: document.getElementById('question'),
+        answerInput: document.getElementById('answer-input'),
+        submitBtn: document.getElementById('submit-btn'),
+        feedbackDisplay: document.getElementById('feedback'),
+        gameResultModal: document.getElementById('game-result-modal'),
+        gameResultContent: document.getElementById('game-result-content'),
+        modalButtons: document.getElementById('modal-buttons')
+    };
+
+    // Actual questions database
+    const questionsDatabase = {
+        "Easy": [
+            {"question": "5 + 3 = ", "answer": 8},
+            {"question": "9 - 2 = ", "answer": 7},
+            {"question": "4 × 3 = ", "answer": 12},
+            {"question": "10 ÷ 2 = ", "answer": 5},
+            {"question": "1 + 1 = ", "answer": 2}
+        ],
+        "Medium": [
+            {"question": "12 + 15 = ", "answer": 27},
+            {"question": "20 - 8 = ", "answer": 12},
+            {"question": "7 × 4 = ", "answer": 28},
+            {"question": "36 ÷ 6 = ", "answer": 6},
+            {"question": "13 + 9 = ", "answer": 22}
+        ],
+        "Hard": [
+            {"question": "45 + 28 = ", "answer": 73},
+            {"question": "100 - 37 = ", "answer": 63},
+            {"question": "12 × 8 = ", "answer": 96},
+            {"question": "144 ÷ 12 = ", "answer": 12},
+            {"question": "25 × 4 = ", "answer": 100}
+        ]
+    };
+
+    let timer;
+    let timeLeft;
+    let currentQuestionIndex = 0;
+    let totalQuestions = 5;
+    let score = 0;
+    let currentLevel = "Easy";
+    let currentQuestionObj = {};
+
+    function startTimer(seconds) {
+        clearInterval(timer);
+        timeLeft = seconds;
+        elements.timerDisplay.textContent = timeLeft;
+        
+        timer = setInterval(() => {
+            timeLeft--;
+            elements.timerDisplay.textContent = timeLeft;
+            
+            if (timeLeft <= 0) {
+                clearInterval(timer);
+                handleTimeout();
+            }
+        }, 1000);
+    }
+
+    function handleTimeout() {
+        checkAnswer("Time's up!"); // Special value for timeout
+    }
+
+    function updateQuestionNumber() {
+        elements.questionNumberDisplay.textContent = `${currentQuestionIndex + 1}/${totalQuestions}`;
+    }
+
+    function showFeedback(message, isCorrect) {
+        elements.feedbackDisplay.innerHTML = `
+            <div class="p-4 rounded-lg ${isCorrect ? 'bg-green-500/20 border border-green-500' : 'bg-red-500/20 border border-red-500'}">
+                <p class="font-orbitron ${isCorrect ? 'text-green-400' : 'text-red-400'}">${message}</p>
+            </div>
+        `;
+    }
+
+    function showModal(message, isWin, nextLevel = null) {
+        elements.gameResultContent.innerHTML = `
+            <div class="text-3xl mb-4">${isWin ? '🎉' : '💀'}</div>
+            <h3 class="text-2xl font-orbitron ${isWin ? 'text-neonpurple-400' : 'text-red-400'} mb-2">
+                ${isWin ? 'LEVEL COMPLETE!' : 'TIME UP!'}
+            </h3>
+            <div class="text-gray-300">${message}</div>
+        `;
+
+        // Clear previous buttons
+        elements.modalButtons.innerHTML = '';
+
+        if (nextLevel) {
+            // Add Next Level button
+            const nextBtn = document.createElement('button');
+            nextBtn.className = 'bg-neonpurple-500 hover:bg-neonpurple-600 text-white px-6 py-2 rounded-lg font-orbitron';
+            nextBtn.textContent = `NEXT LEVEL (${nextLevel.toUpperCase()})`;
+            nextBtn.addEventListener('click', () => {
+                startNewLevel(nextLevel);
+                hideModal();
+            });
+            elements.modalButtons.appendChild(nextBtn);
+        } else {
+            // Add Play Again button
+            const playAgainBtn = document.createElement('button');
+            playAgainBtn.className = 'bg-neonpurple-500 hover:bg-neonpurple-600 text-white px-6 py-2 rounded-lg font-orbitron';
+            playAgainBtn.textContent = 'PLAY AGAIN';
+            playAgainBtn.addEventListener('click', () => {
+                startNewLevel(currentLevel);
+                hideModal();
+            });
+            elements.modalButtons.appendChild(playAgainBtn);
+        }
+
+        // Always add Home button
+        const homeBtn = document.createElement('a');
+        homeBtn.className = 'bg-gray-700 hover:bg-gray-600 text-white px-6 py-2 rounded-lg font-orbitron';
+        homeBtn.textContent = 'BACK HOME';
+        homeBtn.href = '/';
+        elements.modalButtons.appendChild(homeBtn);
+
+        elements.gameResultModal.classList.remove('hidden');
+    }
+
+    function hideModal() {
+        elements.gameResultModal.classList.add('hidden');
+    }
+
+    function getCurrentQuestion() {
+        return questionsDatabase[currentLevel][currentQuestionIndex];
+    }
+
+    function loadNextQuestion() {
+        if (currentQuestionIndex >= totalQuestions) {
+            endLevel();
+            return;
+        }
+
+        currentQuestionObj = getCurrentQuestion();
+        elements.questionDisplay.textContent = currentQuestionObj.question;
+        updateQuestionNumber();
+        elements.answerInput.value = '';
+        elements.answerInput.focus();
+    }
+
+    function endLevel() {
+        clearInterval(timer);
+        
+        let nextLevel = null;
+        if (currentLevel === "Easy" && score === totalQuestions) {
+            nextLevel = "Medium";
+        } else if (currentLevel === "Medium" && score === totalQuestions) {
+            nextLevel = "Hard";
+        }
+        
+        if (nextLevel) {
+            showModal(
+                `Perfect score! ${score}/${totalQuestions}<br>Moving to ${nextLevel} level!`,
+                true,
+                nextLevel
+            );
+        } else if (score === totalQuestions) {
+            showModal(
+                `🏆 Champion!<br>You completed all levels with perfect score!`,
+                true
+            );
+        } else {
+            showModal(
+                `You scored ${score}/${totalQuestions}<br>Try again to unlock next level!`,
+                false
+            );
+        }
+    }
+
+    function startNewLevel(level) {
+        currentLevel = level;
+        currentQuestionIndex = 0;
+        score = 0;
+        
+        elements.levelDisplay.textContent = currentLevel;
+        elements.scoreDisplay.textContent = score;
+        
+        const timeLimit = currentLevel === "Easy" ? 30 : currentLevel === "Medium" ? 45 : 60;
+        startTimer(timeLimit);
+        
+        loadNextQuestion();
+        elements.feedbackDisplay.innerHTML = '';
+    }
+
+    function checkAnswer(userAnswer) {
+        // Handle timeout case
+        if (userAnswer === "Time's up!") {
+            showFeedback("Time's up! The answer was " + currentQuestionObj.answer, false);
+            currentQuestionIndex++;
+            setTimeout(() => {
+                loadNextQuestion();
+            }, 1500);
+            return;
+        }
+
+        // Handle empty answer
+        if (userAnswer === "") {
+            showFeedback("Please enter an answer!", false);
+            return;
+        }
+
+        // Convert to number
+        userAnswer = parseInt(userAnswer);
+        const isCorrect = userAnswer === currentQuestionObj.answer;
+        
+        if (isCorrect) {
+            score++;
+            elements.scoreDisplay.textContent = score;
+            showFeedback(`Correct! The answer is ${currentQuestionObj.answer}`, true);
+        } else {
+            showFeedback(`Incorrect! The correct answer was ${currentQuestionObj.answer}`, false);
+        }
+        
+        currentQuestionIndex++;
+        
+        // Load next question after a brief delay
+        setTimeout(() => {
+            loadNextQuestion();
+        }, 1500);
+    }
+
+    // Event listeners
+    elements.submitBtn.addEventListener('click', () => {
+        fetch("/games/math_quiz", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        action: "answer",
+        question: currentQuestionObj.question,
+        answer: elements.answerInput.value.trim()
+    })
+})
+.then(res => res.json())
+.then(data => {
+    if (data.error) {
+        showFeedback(data.error, false);
+    } else {
+        // Use server response to update UI
+        currentQuestionIndex++;
+        if (data.is_last) {
+            showModal(`Final score: ${data.final_score}/${data.total_questions}`, data.final_score >= 3, data.next_level);
+        } else {
+            currentQuestionObj = {
+                question: data.next_question,
+                answer: data.correct_answer // (for frontend display only)
+            };
+            if (data.correct) {
+                score++;
+                elements.scoreDisplay.textContent = score;
+                showFeedback(`Correct!`, true);
+            } else {
+                showFeedback(`Incorrect! Correct answer was ${data.correct_answer}`, false);
+            }
+            setTimeout(loadNextQuestion, 1500);
+        }
+    }
+});
+
+    });
+
+    elements.answerInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            fetch("/games/math_quiz", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        action: "answer",
+        question: currentQuestionObj.question,
+        answer: elements.answerInput.value.trim()
+    })
+})
+.then(res => res.json())
+.then(data => {
+    if (data.error) {
+        showFeedback(data.error, false);
+    } else {
+        // Use server response to update UI
+        currentQuestionIndex++;
+        if (data.is_last) {
+            showModal(`Final score: ${data.final_score}/${data.total_questions}`, data.final_score >= 3, data.next_level);
+        } else {
+            currentQuestionObj = {
+                question: data.next_question,
+                answer: data.correct_answer // (for frontend display only)
+            };
+            if (data.correct) {
+                score++;
+                elements.scoreDisplay.textContent = score;
+                showFeedback(`Correct!`, true);
+            } else {
+                showFeedback(`Incorrect! Correct answer was ${data.correct_answer}`, false);
+            }
+            setTimeout(loadNextQuestion, 1500);
+        }
+    }
+});
+
+        }
+    });
+
+    // Start initial game
+    startNewLevel("Easy");
+});
+</script>
+
+<style>
+.question-display {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 12px;
+    border: 1px solid rgba(188, 19, 254, 0.2);
+    box-shadow: 0 0 10px rgba(188, 19, 254, 0.1);
+}
+
+.answer-input input {
+    transition: all 0.3s ease;
+}
+
+.answer-input input:focus {
+    box-shadow: 0 0 8px rgba(188, 19, 254, 0.5);
+}
+
+#submit-btn {
+    transition: all 0.2s ease;
+}
+
+#submit-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 8px rgba(188, 19, 254, 0.5);
+}
+
+#game-result-modal {
+    backdrop-filter: blur(5px);
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.question-display {
+    animation: pulse 2s infinite;
+}
+</style>
+{% endblock %}

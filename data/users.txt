@@ -1,0 +1,6 @@
+lisa,lisa@gmail.com,lisa009,12,female,lisa
+humna,humnaghouri001@gmail.com,humna,19,female,hin
+elen,elen@gmail.com,elen,19,female,elen
+Anas,asifanas194@gmail.com,anas12345,19,male, Anshu
+momna,momna@gmail.com,momo,18,female,momo
+ali,ali@gmail.com,ali00,17,male,ali

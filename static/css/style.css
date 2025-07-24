@@ -1,0 +1,374 @@
+.neon-btn {
+    @apply text-white px-5 py-2 rounded-full font-semibold transition-all duration-300 bg-gradient-to-r shadow-md;
+  }
+
+.neon-btn:hover {
+    @apply scale-105 shadow-[0_0_15px_#ff69b4] text-white;
+  }
+
+/* ===== Main Content Styles ===== */
+main {
+  padding: 2rem 0;
+  min-height: calc(100vh - 120px);
+}
+
+/* ===== Button Styles ===== */
+.btn {
+  display: inline-block;
+  background-color: var(--primary-color);
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+  transition: all 0.3s;
+  border: none;
+  cursor: pointer;
+  text-align: center;
+}
+
+.btn:hover {
+  background-color: #2980b9;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.btn-secondary {
+  background-color: var(--secondary-color);
+}
+
+.btn-secondary:hover {
+  background-color: #27ae60;
+}
+
+.btn-danger {
+  background-color: var(--danger-color);
+}
+
+.btn-danger:hover {
+  background-color: #c0392b;
+}
+
+/* ===== Form Styles ===== */
+.form-container {
+  max-width: 500px;
+  margin: 0 auto;
+  background: white;
+  padding: 2rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+.form-container h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  color: var(--dark-color);
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--dark-color);
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+.form-submit {
+  width: 100%;
+  padding: 0.8rem;
+  margin-top: 1rem;
+  font-size: 1rem;
+}
+
+/* ===== Card Styles ===== */
+.card {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+/* ===== Game Styles ===== */
+.game-container {
+  background: white;
+  border-radius: var(--border-radius);
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.game-title {
+  color: var(--dark-color);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+.game-area {
+  margin-top: 2rem;
+}
+
+.game-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: var(--light-color);
+  border-radius: var(--border-radius);
+}
+
+.word-display {
+  font-size: 2rem;
+  letter-spacing: 0.5rem;
+  text-align: center;
+  margin: 2rem 0;
+  font-family: monospace;
+}
+
+.hangman-display {
+  text-align: center;
+  margin: 2rem 0;
+  font-family: monospace;
+  font-size: 1.2rem;
+  line-height: 1.4;
+}
+
+.guessed-letters {
+  text-align: center;
+  margin: 1rem 0;
+  font-size: 1.1rem;
+}
+
+.game-controls {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+  justify-content: center;
+}
+
+.game-controls input {
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  width: 60px;
+  text-align: center;
+}
+
+.choices {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+}
+
+.choice-btn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 1rem 1.5rem;
+  border-radius: var(--border-radius);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.choice-btn:hover {
+  background: #2980b9;
+  transform: scale(1.05);
+}
+
+.game-result {
+  text-align: center;
+  margin: 2rem 0;
+  font-size: 1.2rem;
+}
+
+.question-area {
+  text-align: center;
+  margin: 2rem 0;
+}
+
+.question-area p {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.question-area input {
+  padding: 0.8rem;
+  font-size: 1.2rem;
+  width: 100px;
+  text-align: center;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+}
+
+/* ===== Grid Styles ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 1.5rem 0;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+/* ===== Profile Styles ===== */
+.profile-section {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.profile-info {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.info-item {
+  display: flex;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+.info-item:last-child {
+  border-bottom: none;
+}
+
+.info-item .label {
+  font-weight: 500;
+  width: 120px;
+  color: var(--dark-color);
+}
+
+.edit-form {
+  background: white;
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+/* ===== Table Styles ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+}
+
+th, td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: var(--dark-color);
+  color: white;
+}
+
+tr:hover {
+  background-color: #f5f5f5;
+}
+
+/* ===== Utility Classes ===== */
+.error {
+  color: var(--danger-color);
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background: #fadbd8;
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+.success {
+  color: var(--secondary-color);
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+  background: #d5f5e3;
+  border-radius: var(--border-radius);
+  text-align: center;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+/* ===== Footer Styles ===== */
+footer {
+  background-color: var(--dark-color);
+  color: white;
+  text-align: center;
+  padding: 1rem 0;
+  margin-top: 2rem;
+}
+
+/* ===== Responsive Styles ===== */
+@media (max-width: 768px) {
+  header .container {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .game-controls {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .choices {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .choice-btn {
+    width: 100%;
+  }
+
+  .stats-grid, .games-grid {
+    grid-template-columns: 1fr;
+  }
+}
