@@ -289,7 +289,14 @@ def delete_user():
     return redirect(url_for('admin_panel'))
 
 
+# if __name__ == '__main__':
+#     # Ensure required folder exists before running
+#     os.makedirs('data/scores', exist_ok=True)
+#     app.run(debug=True)  # Run app in debug mode for development
+
+
+# for replit
+
 if __name__ == '__main__':
-    # Ensure required folder exists before running
     os.makedirs('data/scores', exist_ok=True)
-    app.run(debug=True)  # Run app in debug mode for development
+    app.run(host='0.0.0.0', port=81)
